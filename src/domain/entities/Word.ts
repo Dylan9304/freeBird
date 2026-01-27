@@ -4,11 +4,26 @@ export interface Definition {
     partOfSpeech: string;
 }
 
+export interface SimilarWord {
+    word: string;
+    nuance: string;
+}
+
+export interface DifficultyInfo {
+    level: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+    description: string;
+}
+
 export interface Word {
-    id: string; // The word text itself can act as ID
+    id: string;
     text: string;
     phonetic?: string;
     audioUrl?: string;
     definitions: Definition[];
     koreanMeaning?: string;
+    source?: 'ai' | 'dictionary';
+    difficulty?: DifficultyInfo;
+    nuance?: string;
+    similarWords?: SimilarWord[];
+    contextMeaning?: string;
 }

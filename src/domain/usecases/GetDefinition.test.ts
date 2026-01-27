@@ -1,39 +1,54 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GetDefinitionUseCase } from './GetDefinition';
-import { IDictionaryRepository } from '../repositories/IDictionaryRepository';
 import { Word } from '../entities/Word';
+import { IAIAssistantSource } from '../../data/sources/IAIAssistantSource';
 
 describe('GetDefinitionUseCase', () => {
     let useCase: GetDefinitionUseCase;
-    let mockRepo: IDictionaryRepository;
+    let mockAIAssistant: IAIAssistantSource;
 
     beforeEach(() => {
-        mockRepo = {
-            getDefinition: vi.fn()
+        mockAIAssistant = {
+            analyzeWordWithContext: vi.fn()
         };
-        const mockTranslator = {
-            translate: vi.fn().mockResolvedValue('테스트')
-        };
-        useCase = new GetDefinitionUseCase(mockRepo, mockTranslator);
+        useCase = new GetDefinitionUseCase(mockAIAssistant);
     });
 
-    it('should return definition from repository', async () => {
+    it('should return AI analysis result', async () => {
         const mockWord: Word = {
             id: 'test',
             text: 'test',
-            definitions: []
+            definitions: [{ partOfSpeech: 'noun', meaning: 'a test', example: 'This is a test.' }],
+            koreanMeaning: '테스트',
+            source: 'ai'
         };
 
-        vi.mocked(mockRepo.getDefinition).mockResolvedValue(mockWord);
+        vi.mocked(mockAIAssistant.analyzeWordWithContext).mockResolvedValue(mockWord);
 
-        const result = await useCase.execute('test');
+        const result = await useCase.execute('test', 'This is a test sentence.');
 
-        expect(mockRepo.getDefinition).toHaveBeenCalledWith('test');
-        expect(result).toEqual({ ...mockWord, koreanMeaning: '테스트' });
+        expect(mockAIAssistant.analyzeWordWithContext).toHaveBeenCalledWith('test', 'This is a test sentence.');
+        expect(result).toEqual(mockWord);
     });
 
     it('should trim and lowercase the input word', async () => {
-        await useCase.execute('  Test  ');
-        expect(mockRepo.getDefinition).toHaveBeenCalledWith('test');
+        vi.mocked(mockAIAssistant.analyzeWordWithContext).mockResolvedValue(null);
+
+        await useCase.execute('  Test  ', 'sentence');
+
+        expect(mockAIAssistant.analyzeWordWithContext).toHaveBeenCalledWith('test', 'sentence');
+    });
+
+    it('should use word as context if no context provided', async () => {
+        vi.mocked(mockAIAssistant.analyzeWordWithContext).mockResolvedValue(null);
+
+        await useCase.execute('hello');
+
+        expect(mockAIAssistant.analyzeWordWithContext).toHaveBeenCalledWith('hello', 'hello');
+    });
+
+    it('should return null for empty word', async () => {
+        const result = await useCase.execute('   ');
+        expect(result).toBeNull();
     });
 });

@@ -12,6 +12,8 @@ describe('GetVocabularyListUseCase', () => {
             getAll: vi.fn(),
             remove: vi.fn(),
             exists: vi.fn(),
+            getGroupedByPage: vi.fn(),
+            getByUrl: vi.fn(),
         };
         useCase = new GetVocabularyListUseCase(mockRepo);
     });

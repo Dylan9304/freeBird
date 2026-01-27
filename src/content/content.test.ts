@@ -24,10 +24,12 @@ describe('Content Script Interactions', () => {
 
             handleDoubleClick();
 
-            expect(mockSendMessage).toHaveBeenCalledWith({
-                type: MessageType.LOOKUP,
-                payload: { word: 'hello' }
-            });
+            expect(mockSendMessage).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    type: MessageType.LOOKUP,
+                    payload: expect.objectContaining({ word: 'hello' })
+                })
+            );
         });
 
         it('should not send message if selection is empty', () => {

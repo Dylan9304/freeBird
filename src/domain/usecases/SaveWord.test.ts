@@ -14,6 +14,8 @@ describe('SaveWordUseCase', () => {
             getAll: vi.fn(),
             remove: vi.fn(),
             exists: vi.fn(),
+            getGroupedByPage: vi.fn(),
+            getByUrl: vi.fn(),
         };
         useCase = new SaveWordUseCase(mockRepo);
     });

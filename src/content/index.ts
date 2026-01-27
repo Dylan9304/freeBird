@@ -1,10 +1,12 @@
 import { handleDoubleClick, handleSentenceClick } from './interactionHandlers';
+import { initHoverDetector } from './hoverDetector';
 
-// Setup Event Listeners
 document.addEventListener('dblclick', handleDoubleClick);
 
 document.addEventListener('click', (event) => {
     handleSentenceClick(event);
-}, true); // Capture phase to ensure we catch it before others if needed, or bubble.
+}, true);
 
-console.log('English Assistant Content Script Initialized');
+initHoverDetector();
+
+console.log('FreeBird: Content Script Initialized');

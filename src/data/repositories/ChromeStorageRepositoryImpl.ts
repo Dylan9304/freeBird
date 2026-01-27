@@ -1,4 +1,4 @@
-import { IVocabularyRepository } from "@/domain/repositories/IVocabularyRepository";
+import { IVocabularyRepository, PageGroup } from "@/domain/repositories/IVocabularyRepository";
 import { VocabularyItem } from "@/domain/entities/VocabularyItem";
 import { IStorageSource } from "../sources/IStorageSource";
 
@@ -34,5 +34,34 @@ export class ChromeStorageRepositoryImpl implements IVocabularyRepository {
     async exists(id: string): Promise<boolean> {
         const db = await this.getDB();
         return !!db[id];
+    }
+
+    async getGroupedByPage(): Promise<PageGroup[]> {
+        const items = await this.getAll();
+        const groupMap = new Map<string, PageGroup>();
+        
+        for (const item of items) {
+            const url = item.context.url;
+            if (!groupMap.has(url)) {
+                groupMap.set(url, {
+                    url,
+                    title: item.context.title,
+                    items: [],
+                    lastSavedAt: item.savedAt
+                });
+            }
+            const group = groupMap.get(url)!;
+            group.items.push(item);
+            if (item.savedAt > group.lastSavedAt) {
+                group.lastSavedAt = item.savedAt;
+            }
+        }
+        
+        return Array.from(groupMap.values()).sort((a, b) => b.lastSavedAt - a.lastSavedAt);
+    }
+
+    async getByUrl(url: string): Promise<VocabularyItem[]> {
+        const items = await this.getAll();
+        return items.filter(item => item.context.url === url);
     }
 }
