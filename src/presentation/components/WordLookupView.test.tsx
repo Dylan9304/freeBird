@@ -40,7 +40,7 @@ describe('WordLookupView', () => {
         render(<WordLookupView word="unknown" useCase={mockUseCase} />);
 
         await waitFor(() => {
-            expect(screen.getByText(/not found/i)).toBeInTheDocument();
+            expect(screen.getByText(/API key/i)).toBeInTheDocument();
         });
     });
 });

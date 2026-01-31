@@ -6,10 +6,13 @@ export const handleMessage = async (
 ) => {
     if (message.type === MessageType.LOOKUP) {
         if (sender.tab?.windowId) {
+            // Store pending lookup in session storage to handle cold start
+            await chrome.storage.session.set({ pendingLookup: message.payload });
+
             // Open Side Panel
             await chrome.sidePanel.open({ windowId: sender.tab.windowId });
 
-            // Broadcast update
+            // Broadcast update for already open panel
             setTimeout(() => {
                 chrome.runtime.sendMessage({
                     type: 'VIEW_UPDATE',

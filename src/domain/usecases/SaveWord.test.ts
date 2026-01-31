@@ -39,10 +39,11 @@ describe('SaveWordUseCase', () => {
 
         await useCase.execute(mockWord, mockContext);
 
-        expect(mockRepo.save).toHaveBeenCalledWith({
+        expect(mockRepo.save).toHaveBeenCalledWith(expect.objectContaining({
             ...mockWord,
+            id: expect.any(String),
             context: mockContext,
             savedAt: now
-        });
+        }));
     });
 });

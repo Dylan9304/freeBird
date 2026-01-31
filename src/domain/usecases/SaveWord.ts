@@ -8,6 +8,7 @@ export class SaveWordUseCase {
     async execute(word: Word, context: ContextInfo): Promise<void> {
         const item: VocabularyItem = {
             ...word,
+            id: Date.now().toString(36) + Math.random().toString(36).substring(2),
             context,
             savedAt: Date.now()
         };

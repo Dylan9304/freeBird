@@ -10,6 +10,23 @@ function App() {
   const [currentContext, setCurrentContext] = useState<any>(null);
 
   useEffect(() => {
+    // Check for pending lookup in session storage (for cold start)
+    const checkPendingLookup = async () => {
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.session) {
+        const data = await chrome.storage.session.get('pendingLookup') as { pendingLookup?: { word: string; context: any } };
+        if (data.pendingLookup) {
+          console.log('App: Found pending lookup', data.pendingLookup);
+          setCurrentWord(data.pendingLookup.word);
+          setCurrentContext(data.pendingLookup.context);
+          setActiveTab('search');
+          // Clear it after using
+          await chrome.storage.session.remove('pendingLookup');
+        }
+      }
+    };
+
+    checkPendingLookup();
+
     if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.onMessage) {
       chrome.runtime.onMessage.addListener((message) => {
         if (message.type === 'VIEW_UPDATE' && message.payload?.word) {

@@ -10,7 +10,7 @@ chrome.runtime.onInstalled.addListener(() => {
         title: 'Lookup Definition',
         contexts: ['selection']
     });
-    
+
     chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
 });
 
@@ -26,7 +26,15 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
         setTimeout(() => {
             chrome.runtime.sendMessage({
                 type: 'VIEW_UPDATE',
-                payload: { word: info.selectionText }
+                payload: {
+                    word: info.selectionText,
+                    context: {
+                        sentence: info.selectionText, // Use selection as sentence for now
+                        url: tab?.url || '',
+                        title: tab?.title || '',
+                        date: new Date().toISOString()
+                    }
+                }
             });
         }, 500);
     }

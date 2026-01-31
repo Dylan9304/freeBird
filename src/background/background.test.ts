@@ -11,6 +11,17 @@ const mockGetVoices = vi.fn((cb) => cb([
 ]));
 
 (globalThis as any).chrome = {
+    storage: {
+        session: {
+            set: vi.fn(),
+            get: vi.fn(),
+            remove: vi.fn(),
+        },
+        local: {
+            set: vi.fn(),
+            get: vi.fn(),
+        }
+    },
     sidePanel: {
         open: mockOpenSidePanel,
         setOptions: vi.fn(),
